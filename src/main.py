@@ -26,6 +26,10 @@ if __name__ == "__main__":
                 PW += 100/(5/interval)
                 moe.set_duty_cycle(PW)
                 utime.sleep(interval)
+            for value in range(5/interval):
+                PW = 0
+                moe.set_duty_cycle(PW)
+                utime.sleep(interval)
     except Exception as e:
         print(e)
         print("stopped")
