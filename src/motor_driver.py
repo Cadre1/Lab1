@@ -1,5 +1,6 @@
-"""! @file motor_driver.py (Copy of step_response.py)
-Creates and records the response of the given circuit for a step response input 
+"""! @file motor_driver.py
+This program creates the class "MotorDriver" which initializes the GPIO pins as PWM outputs for one motor.
+This class also contains the ability to set the PWM percent duty-cycle
 """
 import pyb
 import utime
@@ -11,32 +12,36 @@ class MotorDriver:
     def __init__(self, en_pin, in1pin, in2pin, timer):
         """! 
         Creates a motor driver by initializing GPIO
-        pins and turning off the motor for safety. 
-        @param en_pin (There will be several parameters)
-        """"""!
-        Led Setup function setting up interrupts, pins, queues, and prints output voltages
+        pins as PWM outputs and turning off the motor for safety. 
+        @param en_pin The enable CPU equivalent L6206 pin for the driver hardware
+        @param in1pin The IN1 CPU equivalent L6206 pin for the driver hardware 
+        @param in2pin The IN1 CPU equivalent L6206 pin for the driver hardware
+        @param timer The set up timer
         """
-        # Initializing Pins
-        # Enable Pin
-        en_pin = pyb.Pin(en_pin, pyb.Pin.OUT_PP)
-        en_pin.high()
-        # IN Pin 1
-        in1pin = pyb.Pin(in1pin, pyb.Pin.OUT_PP)
-        in1pin.low()
-        # IN Pin 2
-        in2pin = pyb.Pin(in2pin, pyb.Pin.OUT_PP)
-        in2pin.low()
-        
-        # Initializing the PWM Timers
-        self.PWM_tim1 = timer.channel(1,
-                                      pyb.Timer.PWM,
-                                      pin=in1pin,
-                                      pulse_width=8000)
-        self.PWM_tim2 = timer.channel(2,
-                                      pyb.Timer.PWM,
-                                      pin=in2pin,
-                                      pulse_width=8000)
-        print ("Creating a motor driver")
+        try:
+            # Initializing Pins
+            # Enable Pin
+            en_pin = pyb.Pin(en_pin, pyb.Pin.OUT_PP)
+            en_pin.high()
+            # IN Pin 1
+            in1pin = pyb.Pin(in1pin, pyb.Pin.OUT_PP)
+            in1pin.low()
+            # IN Pin 2
+            in2pin = pyb.Pin(in2pin, pyb.Pin.OUT_PP)
+            in2pin.low()
+            
+            # Initializing the PWM Timers
+            self.PWM_tim1 = timer.channel(1,
+                                          pyb.Timer.PWM,
+                                          pin=in1pin,
+                                          pulse_width=8000)
+            self.PWM_tim2 = timer.channel(2,
+                                          pyb.Timer.PWM,
+                                          pin=in2pin,
+                                          pulse_width=8000)
+            print ("Created a motor driver")
+        except Exception as e:
+            print(e)
 
 
     def set_duty_cycle(self, level):
@@ -48,16 +53,23 @@ class MotorDriver:
         @param level A signed integer holding the duty
                cycle of the voltage sent to the motor 
         """
-        
-        if level <= 0:
-            self.PWM_tim1.pulse_width_percent(0)
-            self.PWM_tim2.pulse_width_percent(-1*level)
-        elif level > 0:
-            self.PWM_tim1.pulse_width_percent(level)
-            self.PWM_tim2.pulse_width_percent(0)
-        print (f"Setting duty cycle to {level}")
+        try:
+            # Testing if the level is negative or positive and setting the PWMs of each IN pin correspondingly
+            if level <= 0:
+                if level < -100:
+                    level == -100
+                self.PWM_tim1.pulse_width_percent(0)
+                self.PWM_tim2.pulse_width_percent(-1*level)
+            elif level > 0:
+                if level > 100:
+                    level == 100
+                self.PWM_tim1.pulse_width_percent(level)
+                self.PWM_tim2.pulse_width_percent(0)
+            print (f"Setting duty cycle to {level}")
+        except Exception as e:
+            print(e)  
           
-    
+# Test Code
 if __name__ == "__main__":
     a_pin = pyb.Pin(pyb.Pin.board.PA10, pyb.Pin.OUT_PP)
     in1pin = pyb.Pin(pyb.Pin.board.PB4, pyb.Pin.OUT_PP)

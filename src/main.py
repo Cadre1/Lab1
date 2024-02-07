@@ -1,7 +1,12 @@
+"""! @file main.py
+This program sets up the pins and timers required for a "MotorDriver" object and creates the object.
+It then turns the motor to spin from 0% PWM to 100% PWM to -100% PWM to 0% and waits to repeat again.
+"""
 import motor_driver
 import utime
 
 if __name__ == "__main__":
+    # Sets up pins and timers
     a_pin = pyb.Pin(pyb.Pin.board.PA10, pyb.Pin.OUT_PP)
     in1pin = pyb.Pin(pyb.Pin.board.PB4, pyb.Pin.OUT_PP)
     in2pin = pyb.Pin(pyb.Pin.board.PB5, pyb.Pin.OUT_PP)
@@ -9,6 +14,7 @@ if __name__ == "__main__":
 
     moe = motor_driver.MotorDriver(a_pin, in1pin, in2pin, a_timer)
         
+    # Cycles between -100% and 100% PWM and waiting
     PW = 0
     time_range = 5
     interval = 0.05
@@ -30,6 +36,7 @@ if __name__ == "__main__":
                 PW = 0
                 moe.set_duty_cycle(PW)
                 utime.sleep(interval)
-    except Exception as e:
-        print(e)
+    except KeyboardInterrupt:
+        PW = 0
+        moe.set_duty_cycle(PW)
         print("stopped")
